@@ -24,10 +24,14 @@ const updata = {
    send: async function (value, apiname) {
       let reqData = null
       if (value instanceof Promise) {
-         reqData = await value()
+         try {
+            reqData = await value
+         } catch (error) {
+            Promise.reject(error)
+         }
       } else if (value instanceof Function) {
          reqData = value()
-      } else if (value && typeof value == 'object' && !Array.isArray(value)) {
+      } else if (value && typeof value == 'object' && typeof value != 'function' && !Array.isArray(value)) {
          reqData = value
       } else {
          Promise.reject('无请求对象')
