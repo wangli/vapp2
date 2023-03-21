@@ -21,23 +21,9 @@ const updata = {
     * @param {string} apiname 
     * @returns 
     */
-   send: async function (value, apiname) {
-      let reqData = null
-      if (value instanceof Promise) {
-         reqData = await value()
-      } else if (value instanceof Function) {
-         reqData = value()
-      } else if (value && typeof value == 'object' && !Array.isArray(value)) {
-         reqData = value
-      } else {
-         Promise.reject('无请求对象')
-      }
-      if (!reqData) {
-         Promise.reject('无效的请求')
-      }
-
+   send: function (reqData, apiname) {
       if (typeof reqData.url != 'string') {
-         Promise.reject('接口地址无效')
+         return new Promise((res, rej) => rej('接口地址无效'))
       }
       let pending = []
       if (!updata.PendingItems.includes(apiname)) {
@@ -48,60 +34,62 @@ const updata = {
       }
       updata.PendingItems.push(...pending)
 
-      // 发送拦截处理
-      interceptorItemsReq.forEach(handle => {
-         reqData = handle(reqData, apiname)
-      })
-      // 请求数据模拟返回
-      if (network.mock) {
-         let mockData = updataMock.getData(apiname, reqData)
-         if (mockData) {
-            removePendingItems(apiname)
-            removePendingItems(reqData.url)
-            // 获取数据拦截处理
-            interceptorItemsRes.forEach(handle => {
-               mockData = handle(mockData, apiname)
-            })
-            return mockData
-         }
-      }
-      try {
-         let resData = await Request(reqData)
-         removePendingItems(apiname)
-         removePendingItems(reqData.url)
-         let data = resData
-         // 获取数据拦截处理
-         interceptorItemsRes.forEach(handle => {
-            data = handle(data, apiname)
+      return new Promise((resolve, reject) => {
+         // 发送拦截处理
+         interceptorItemsReq.forEach(handle => {
+            reqData = handle(reqData, apiname)
          })
-         if (data instanceof Function) {
-            return data.call(null, apiname)
-         } else {
-            // 获取code
-            let code = typeof data.code != 'undefined' ? data.code : -1
-            if (code == state.code.ok) {
-               return data
-            } else if (code == state.code.token) {
-               cmdMessage(data.message, 'warning')
-               token.clear()
-            } else if (code == state.code.error) {
-               cmdMessage(data.message, 'error')
-            } else {
-               if (typeof state.code.reject == 'number' && code > state.code.reject) {
-                  Promise.reject(data)
-               } else {
-                  cmdMessage(data.message, 'warning')
-               }
+         // 请求数据模拟返回
+         if (network.mock) {
+            let mockData = updataMock.getData(apiname, reqData)
+            if (mockData) {
+               removePendingItems(apiname)
+               removePendingItems(reqData.url)
+               // 获取数据拦截处理
+               interceptorItemsRes.forEach(handle => {
+                  mockData = handle(mockData, apiname)
+               })
+               resolve(mockData)
+               return
             }
          }
 
-      } catch (error) {
-         removePendingItems(apiname)
-         removePendingItems(reqData.url)
-         if (reqData.fully) {
-            Promise.reject(error)
-         }
-      }
+         Request(reqData).then(resData => {
+            removePendingItems(apiname)
+            removePendingItems(reqData.url)
+            let data = resData
+            // 获取数据拦截处理
+            interceptorItemsRes.forEach(handle => {
+               data = handle(data, apiname)
+            })
+            if (typeof data == 'function') {
+               resolve(data.call(null, apiname))
+            } else if (data) {
+               // 获取code
+               let code = typeof data.code != 'undefined' ? data.code : -1
+               if (code == state.code.ok) {
+                  resolve(data)
+               } else if (code == state.code.token) {
+                  cmdMessage(data.message, 'warning')
+                  token.clear()
+               } else if (code == state.code.error) {
+                  cmdMessage(data.message, 'error')
+               } else {
+                  if (typeof state.code.reject == 'number' && code > state.code.reject) {
+                     reject(data)
+                  } else {
+                     cmdMessage(data.message, 'warning')
+                  }
+               }
+            }
+         }, err => {
+            removePendingItems(apiname)
+            removePendingItems(reqData.url)
+            if (reqData.fully) {
+               reject(err)
+            }
+         });
+      })
    },
    /**
     * 扩展updata请求对象
