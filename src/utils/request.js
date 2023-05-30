@@ -2,69 +2,51 @@
  * 获取服务端api接口数据
  */
 
-import { network } from '../config'
 import { jsonToParams } from './index'
-import token from '../db/token'
 
-let responseType = 'json'
-let authKey = 'Authorization'
-export default function (_obj) {
-   authKey = network.authKey || 'Authorization'
-   responseType = _obj.responseType ? _obj.responseType : network.responseType || 'json'
+export default function (_obj, _network = {}) {
+   let network = Object.assign({
+      host: '',
+      authKey: 'token',
+      responseType: 'json',
+      method: 'get',
+      mode: 'cors',
+      headers: {
+         'Access-Control-Allow-Origin': '*',
+         'Content-Type': 'application/json'
+      }
+   }, _network)
+   // 保存令牌的名称
+   let tokenName = network.systemName ? network.systemName + "_" + network.authKey : network.authKey
    // 地址
    let url = /^(?!https?:\/\/)/.test(_obj.url) ? network.host + _obj.url : _obj.url
    // 令牌
-   let mytoken = token.value ? token.value.replace(/\"/g, '') : ''
-   let authorization = mytoken ? {
-      [authKey]: mytoken
-   } : {};
+   let authorization = localStorage.getItem(tokenName) ? { 'Authorization': localStorage.getItem(tokenName) } : {}
    // 完全自定义覆盖
    let customize = _obj.customize || {}
-   // 头部信息
-   let headers = {
-      'Access-Control-Allow-Origin': '*',
-      'Content-Type': 'application/json'
-   }
-   // 如果 headers为'','null',false删除默认配置
-   if (!network.headers || (typeof network.headers == 'string' && (network.headers == '' || network.headers == 'null'))) {
-      headers = {}
-   } else {
-      Object.assign(headers, network.headers)
+   // 头部信息，如果 headers为'','null',false删除默认配置
+   if (!network.headers || (typeof network.headers == 'string')) {
+      network.headers = {}
    }
    // 请求对象
    let obj = Object.assign({
       method: _obj.method || network.method,
-      mode: network.mode || 'cors',
-      headers: new Headers(Object.assign(headers, authorization, _obj.headers))
+      mode: _obj.mode || network.mode,
+      signal: _obj.signal,
+      headers: new Headers(Object.assign(network.headers, authorization, _obj.headers))
    }, customize)
-   if (obj.method && obj.method.toUpperCase() == "POST") {
-      let contentType = obj.headers.get('Content-Type')
-      if (contentType == 'application/json') {
-         obj.body = JSON.stringify(_obj.data)
-      } else if (contentType == 'multipart/form-data' || contentType == false) {
-         const formData = new FormData();
-         for (let key in _obj.data) {
-            formData.append(key, _obj.data[key])
-         };
-         obj.headers.delete('Content-Type')
-         obj.body = formData
-      } else {
-         obj.body = _obj.data
-      }
+   if (obj.method.toUpperCase() == "POST") {
+      obj.body = (obj.headers.get('Content-Type') == 'application/json') ? JSON.stringify(_obj.data) : _obj.data
    } else {
       url = /\?/.test(url) ? url + "&" + jsonToParams(_obj.data) : url + "?" + jsonToParams(_obj.data)
    }
    //    请求数据
    return new Promise((resolve, reject) => {
       fetch(url, obj).then(response => {
-         if (response.ok) {
-            if (responseType) {
-               return response[responseType]()
-            } else {
-               return response.json()
-            }
+         if (network.responseType) {
+            return response[network.responseType]()
          } else {
-            reject(response)
+            return response.json()
          }
       }, reject).then(resolve);
    })

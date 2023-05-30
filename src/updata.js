@@ -23,25 +23,26 @@ const updata = {
     */
    send: async function (value, apiname) {
       let reqData = null
+      let reject = null
       if (value instanceof Promise) {
          try {
             reqData = await value
          } catch (error) {
-            Promise.reject(error)
+            throw new Error(error)
          }
       } else if (value instanceof Function) {
          reqData = value()
       } else if (value && typeof value == 'object' && typeof value != 'function' && !Array.isArray(value)) {
          reqData = value
       } else {
-         Promise.reject('无请求对象')
+         throw new Error('无请求对象')
       }
       if (!reqData) {
-         Promise.reject('无效的请求')
+         throw new Error('无效的请求')
       }
 
       if (typeof reqData.url != 'string') {
-         Promise.reject('接口地址无效')
+         throw new Error('接口地址无效')
       }
       let pending = []
       if (!updata.PendingItems.includes(apiname)) {
@@ -70,7 +71,7 @@ const updata = {
          }
       }
       try {
-         let resData = await Request(reqData)
+         let resData = await Request(reqData, network)
          removePendingItems(apiname)
          removePendingItems(reqData.url)
          let data = resData
@@ -80,6 +81,12 @@ const updata = {
          })
          if (data instanceof Function) {
             return data.call(null, apiname)
+         } else if (data instanceof Promise) {
+            try {
+               return await data
+            } catch (error) {
+               throw new Error(error)
+            }
          } else {
             // 获取code
             let code = typeof data.code != 'undefined' ? data.code : -1
@@ -92,7 +99,8 @@ const updata = {
                cmdMessage(data.message, 'error')
             } else {
                if (typeof state.code.reject == 'number' && code > state.code.reject) {
-                  Promise.reject(data)
+                  reject = data
+                  throw new Error('操作无效')
                } else {
                   cmdMessage(data.message, 'warning')
                }
@@ -102,8 +110,10 @@ const updata = {
       } catch (error) {
          removePendingItems(apiname)
          removePendingItems(reqData.url)
-         if (reqData.fully) {
-            Promise.reject(error)
+         if (reject) {
+            throw new Error(reject.message || error.message)
+         } else if (reqData.fully) {
+            throw new Error(error)
          }
       }
    },

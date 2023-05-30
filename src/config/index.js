@@ -15,7 +15,10 @@ export const network = {
    authKey: 'Authorization',
    responseType: 'json',
    method: 'POST',
-   mock: false
+   mock: false,
+   get systemName() {
+      return system.name
+   }
 }
 
 export const state = {
