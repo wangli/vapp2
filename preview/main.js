@@ -8,7 +8,7 @@ const pageA = { name: 'page_a', render: () => h('a', { href: '#/b' }, '我是页
 const pageB = { name: 'page_b', render: () => h('a', { href: '#/demo' }, '我是页面B') }
 // 我是路由配置
 const pages = [
-   { path: '/a', name: 'pageA', component: pageA },
+   { path: '/', name: 'pageA', component: pageA },
    { path: '/b', name: 'pageB', component: pageB },
    { path: '/demo', name: 'demo', component: demo }
 ]

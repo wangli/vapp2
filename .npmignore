@@ -1,0 +1,8 @@
+src/
+preview/
+public/
+index.html
+vite.config.js
+.jsbeautifyrc
+yarn.lock
+vapp2.code-workspace

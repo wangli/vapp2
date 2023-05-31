@@ -57,8 +57,8 @@ const create = function (pages, options = {}) {
 }
 const watchRoute = function () {
    watch(route, newRoute => {
-      if (newRoute[keyName.value]) {
-         selectMenu(newRoute[keyName.value])
+      if (newRoute.name) {
+         selectMenu(newRoute.name)
       }
    }, {
       immediate: true
