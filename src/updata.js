@@ -75,6 +75,7 @@ const updata = {
          removePendingItems(apiname)
          removePendingItems(reqData.url)
          let data = resData
+         let resKey = state.response
          // 获取数据拦截处理
          interceptorItemsRes.forEach(handle => {
             data = handle(data, apiname)
@@ -89,20 +90,20 @@ const updata = {
             }
          } else {
             // 获取code
-            let code = typeof data.code != 'undefined' ? data.code : -1
+            let code = typeof data[resKey.code] != 'undefined' ? data[resKey.code] : -1
             if (code == state.code.ok) {
                return data
             } else if (code == state.code.token) {
-               cmdMessage(data.message, 'warning')
+               cmdMessage(data[resKey.message], 'warning')
                token.clear()
             } else if (code == state.code.error) {
-               cmdMessage(data.message, 'error')
+               cmdMessage(data[resKey.message], 'error')
             } else {
                if (typeof state.code.reject == 'number' && code > state.code.reject) {
                   reject = data
                   throw new Error('操作无效')
                } else {
-                  cmdMessage(data.message, 'warning')
+                  cmdMessage(data[resKey.message], 'warning')
                }
             }
          }

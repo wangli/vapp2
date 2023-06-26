@@ -31,8 +31,15 @@ export const state = {
       token: 1000,
       //    错误
       error: 'error',
+      // 消息
+      message: 'message',
       // 放行
       reject: null
+   },
+   response: {
+      code: 'code',
+      message: 'message',
+      result: 'result'
    },
    status: {}
 }

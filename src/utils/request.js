@@ -33,7 +33,7 @@ export default function (_obj, _network = {}) {
       method: _obj.method || network.method,
       mode: _obj.mode || network.mode,
       signal: _obj.signal,
-      headers: new Headers(Object.assign(network.headers, authorization, _obj.headers))
+      headers: new Headers(Object.assign({}, network.headers, authorization, _obj.headers))
    }, customize)
    if (obj.method.toUpperCase() == "POST") {
       obj.body = (obj.headers.get('Content-Type') == 'application/json') ? JSON.stringify(_obj.data) : _obj.data
