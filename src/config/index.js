@@ -13,6 +13,7 @@ export const system = {
 export const network = {
    host: '',
    authKey: 'Authorization',
+   authName: 'Authorization',
    responseType: 'json',
    method: 'POST',
    mock: false,
@@ -68,7 +69,12 @@ export const init = function (config) {
    if (config) {
       config.system && Object.assign(system, config.system)
       config.network && Object.assign(network, config.network)
-      config.state && Object.assign(state, config.state)
+      if (config.state && typeof config.state == 'object') {
+         for (const key in state) {
+            config.state[key] && Object.assign(state[key], config.state[key])
+         }
+      }
+
       config.frame && Object.assign(frame, config.frame)
       config.style && Object.assign(style, config.style)
       config.navs && Navs.init(config.navs, config.navsOptions)

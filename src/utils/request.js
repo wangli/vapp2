@@ -8,6 +8,7 @@ export default function (_obj, _network = {}) {
    let network = Object.assign({
       host: '',
       authKey: 'token',
+      authName: 'token',
       responseType: 'json',
       method: 'get',
       mode: 'cors',
@@ -17,11 +18,12 @@ export default function (_obj, _network = {}) {
       }
    }, _network)
    // 保存令牌的名称
-   let tokenName = network.systemName ? network.systemName + "_" + network.authKey : network.authKey
+   let tokenKey = network.systemName ? network.systemName + "_" + network.authKey : network.authKey
+   let tokenName = network.authName
    // 地址
    let url = /^(?!https?:\/\/)/.test(_obj.url) ? network.host + _obj.url : _obj.url
    // 令牌
-   let authorization = localStorage.getItem(tokenName) ? { 'Authorization': localStorage.getItem(tokenName) } : {}
+   let authorization = localStorage.getItem(tokenKey) ? { [tokenName]: localStorage.getItem(tokenKey) } : {}
    // 完全自定义覆盖
    let customize = _obj.customize || {}
    // 头部信息，如果 headers为'','null',false删除默认配置
