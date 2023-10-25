@@ -37,9 +37,10 @@ export default function (_obj, _network = {}) {
       signal: _obj.signal,
       headers: new Headers(Object.assign({}, network.headers, authorization, _obj.headers))
    }, customize)
-   if (obj.method.toUpperCase() == "POST") {
+   let method = obj.method.toUpperCase()
+   if (method == "POST" || method == "PUT") {
       obj.body = (obj.headers.get('Content-Type') == 'application/json') ? JSON.stringify(_obj.data) : _obj.data
-   } else {
+   } else if (_obj.data) {
       url = /\?/.test(url) ? url + "&" + jsonToParams(_obj.data) : url + "?" + jsonToParams(_obj.data)
    }
    //    请求数据

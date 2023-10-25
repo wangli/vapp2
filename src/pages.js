@@ -8,7 +8,7 @@ import token from './db/token'
 let router = null
 let route = null
 let before = () => true
-
+let after = () => true
 const beginTime = {
    get value() {
       if (localStorage.getItem(system.name + "_" + 'pageBeginTime')) {
@@ -32,19 +32,24 @@ const create = function (pages, options = {}) {
          routes: pages,
       }, options)
       router = createRouter(myOptions)
-      router.afterEach(() => {
-         if ((new Date().getTime() - beginTime.value) > token.keeptime * 1000) {
-            token.clear()
-            beginTime.clear()
-         } else {
-            beginTime.value = new Date().getTime()
+      router.afterEach((to, from) => {
+         if (after(to, from)) {
+            if ((new Date().getTime() - beginTime.value) > token.keeptime * 1000) {
+               token.clear()
+               beginTime.clear()
+            } else {
+               beginTime.value = new Date().getTime()
+            }
          }
       })
       router.beforeEach((to, from, next) => {
-         if (before(to, from)) {
+         let page = before(to, from)
+         if (page === true) {
             next()
+         } else if (page !== false) {
+            return next(page)
          } else {
-            return false
+            return page
          }
       })
       route = router.currentRoute
@@ -111,6 +116,9 @@ export default {
    back() {
       if (!before()) return false
       router && router.back()
+   },
+   setAfter(fun) {
+      typeof fun == 'function' && (after = fun)
    },
    setBefore(fun) {
       typeof fun == 'function' && (before = fun)
