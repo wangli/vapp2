@@ -30,6 +30,10 @@ export default function (_obj, _network = {}) {
    if (!network.headers || (typeof network.headers == 'string')) {
       network.headers = {}
    }
+   // 返回的数据对象类型
+   if (typeof _obj.responseType != 'undefined') {
+      network.responseType = _obj.responseType
+   }
    // 请求对象
    let obj = Object.assign({
       method: _obj.method || network.method,
@@ -38,19 +42,25 @@ export default function (_obj, _network = {}) {
       headers: new Headers(Object.assign({}, network.headers, authorization, _obj.headers))
    }, customize)
    let method = obj.method.toUpperCase()
-   if (method == "POST" || method == "PUT") {
+   if (_obj.data instanceof FormData) {
+      if (obj.headers.has('Content-Type')) {
+         obj.headers.delete("Content-Type")
+      }
+      obj.body = _obj.data
+   } else if (method == "POST" || method == "PUT") {
       obj.body = (obj.headers.get('Content-Type') == 'application/json') ? JSON.stringify(_obj.data) : _obj.data
    } else if (_obj.data) {
       url = /\?/.test(url) ? url + "&" + jsonToParams(_obj.data) : url + "?" + jsonToParams(_obj.data)
    }
    //    请求数据
    return new Promise((resolve, reject) => {
+      let resType = (typeof _obj.responseType != 'undefined') ? _obj.responseType : network.responseType
       fetch(url, obj).then(response => {
-         if (network.responseType) {
-            return response[network.responseType]()
+         if (resType && response[resType]) {
+            return response[resType]()
          } else {
-            return response.json()
+            return response.body
          }
-      }, reject).then(resolve);
+      }).then(resolve).catch(reject)
    })
 }

@@ -49,7 +49,7 @@ const use = function (install) {
 const router = function (items, options) {
    // 页面路由
    if (app) {
-      app.use(Pages.create(items, options))
+      app.use(Pages.create(items, options || {}))
    }
 }
 

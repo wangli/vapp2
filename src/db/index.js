@@ -2,6 +2,7 @@ import LocalStore from './localStore'
 import EXP from './localStore/explain'
 import { system } from '../config'
 import { event } from '../common'
+import { initBind, bindData, unBindData } from './bindData'
 /**
  * 数据共享模块，主要通过localStorage共享
  */
@@ -20,12 +21,15 @@ const db = {
    // 清除数据，可以是数据字段的字符串，也可以是字符串数组；当值是true时表示清除所有；
    clear(name) {
       localStore && localStore.remove(name)
+      unBindData(name)
    },
    /**
     * 创建深度相应的数据对象
-    * @param {*} name 
+    * @param {*} name 数据对象属性
+    * @param {*} data 数据值
+    * @param {boolean} bind 是否绑定值变化（数据值必须是reactive对象）
     */
-   addDeep(name, data) {
+   addDeep(name, data, bind = false) {
       if (this[name]) {
          throw '当前[' + name + ']已存在';
       } else if (localStore) {
@@ -40,9 +44,10 @@ const db = {
          if (data && !localStore.isset(name)) {
             localStore.defineObject(name, data)
          }
+         bind && bindData(name, data)
       } else {
          if (!_fillDeepData[name]) {
-            _fillDeepData[name] = data
+            _fillDeepData[name] = { name, data, bind }
          }
       }
    },
@@ -87,6 +92,7 @@ const db = {
 export const createLocalStore = function () {
    if (!localStore) {
       localStore = new LocalStore(system.name + '_')
+      initBind(localStore)
       // 响应事件
       localStore.dataChange = function (name, data) {
          db.dataChange(name, data)
@@ -94,7 +100,8 @@ export const createLocalStore = function () {
       let names = Object.keys(_fillDeepData)
       if (names.length > 0) {
          names.forEach(name => {
-            this.addDeep(name, _fillDeepData[name])
+            let val = _fillDeepData[name]
+            db.addDeep(val.name, val.data, val.bind)
             delete _fillDeepData[name]
          })
       }

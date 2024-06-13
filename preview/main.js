@@ -1,6 +1,7 @@
 import { h, resolveComponent } from 'vue'
 import { create } from '../src'
 import demo from './demo.vue'
+import bbb from './bbb.vue'
 
 // 我是页面A
 const pageA = { name: 'page_a', render: () => h('a', { href: '#/b' }, '我是页面A') }
@@ -13,17 +14,20 @@ const pages = [
    { path: '/demo', name: 'demo', component: demo }
 ]
 // 创建一个最简单的应用
-const app=create('#app', {
-   config:{
-      system:{
-         name:'myapp'
+const app = create('#app', {
+   config: {
+      system: {
+         name: 'myapp'
       }
    },
-   frame:{
-      name: 'main_page',
-      setup() {
-         return () => h(resolveComponent('router-view'))
-      }
+   frame: {
+      app_main: {
+         name: 'main_page',
+         setup() {
+            return () => h(resolveComponent('router-view'))
+         }
+      },
+      global: [bbb]
    },
    pages
 })

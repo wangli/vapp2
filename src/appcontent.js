@@ -1,4 +1,4 @@
-import { h, onMounted } from 'vue'
+import { h, onMounted, isVNode } from 'vue'
 import { event } from './common'
 import { isAuth } from './authority'
 import { frame as frameConfig } from './config'
@@ -34,11 +34,29 @@ export default {
                // 登录页
                containerList.push(h(frame[frameConfig.login], {}, ""))
             }
+         } else if (frameConfig.main && frame[frameConfig.main]) {
+            // 只有主页
+            containerList.push(h(frame[frameConfig.main], {}, ""))
          } else if ((typeof frame == 'object' && frame.name) || typeof frame == 'function') {
             // 无登录页面
-            containerList.push(h(frame, {}, ""))
+            if (isVNode(frame)) {
+               containerList.push(frame)
+            } else {
+               containerList.push(h(frame, {}, ""))
+            }
          } else {
             console.warn('没有对应的frame页面')
+         }
+         if (Array.isArray(frame.global)) {
+            frame.global.forEach(element => {
+               containerList.push(h(element))
+            })
+         } else if (frame.global) {
+            if (isVNode(frame.global)) {
+               containerList.push(frame.global)
+            } else {
+               containerList.push(h(frame.global))
+            }
          }
 
          return h('div', { id: "appcontent", style }, containerList)

@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 import * as Navs from './navs'
 
 export const system = {
@@ -64,6 +64,11 @@ export const style = {
 }
 // 设置导航菜单
 export const setNavs = Navs.init
+// 一些规则
+export const rules = reactive({
+   // 权限按钮隐藏
+   authBtnHidden: false
+})
 // 初始化配置
 export const init = function (config) {
    if (config) {
@@ -77,6 +82,7 @@ export const init = function (config) {
 
       config.frame && Object.assign(frame, config.frame)
       config.style && Object.assign(style, config.style)
+      config.rules && Object.assign(rules, config.rules)
       config.navs && Navs.init(config.navs, config.navsOptions)
       config.authority && (authority.value = config.authority)
    }
@@ -86,6 +92,7 @@ export const init = function (config) {
       state,
       frame,
       style,
-      navs
+      navs,
+      rules
    }
 }

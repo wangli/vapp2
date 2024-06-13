@@ -88,6 +88,8 @@ const updata = {
             } catch (error) {
                throw new Error(error)
             }
+         } else if (data instanceof ReadableStream) {
+            return data
          } else {
             // 获取code
             let code = typeof data[resKey.code] != 'undefined' ? data[resKey.code] : -1

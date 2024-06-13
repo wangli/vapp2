@@ -1,5 +1,5 @@
 import { watch } from 'vue'
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 import { selectMenu, keyName } from './config/navs'
 import { system } from './config'
 import token from './db/token'
@@ -28,7 +28,7 @@ const beginTime = {
 const create = function (pages, options = {}) {
    if (Array.isArray(pages)) {
       let myOptions = Object.assign({
-         history: createWebHashHistory(),
+         history: options.html5 ? createWebHistory() : createWebHashHistory(),
          routes: pages,
       }, options)
       router = createRouter(myOptions)
