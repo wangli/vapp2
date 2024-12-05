@@ -5,6 +5,7 @@ import token from './db/token'
 import cmd from './cmd'
 import { reactive } from 'vue'
 import updataMock from './updataMock'
+import { isAsync } from './utils'
 
 // 拦截处理方法
 let interceptorItemsReq = []
@@ -82,7 +83,7 @@ const updata = {
          })
          if (data instanceof Function) {
             return data.call(null, apiname)
-         } else if (data instanceof Promise) {
+         } else if (isAsync(data)) {
             try {
                return await data
             } catch (error) {

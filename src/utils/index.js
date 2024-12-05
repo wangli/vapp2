@@ -99,3 +99,11 @@ export const getUrlParam = function (name, decode = true) {
    url.replace(reg, (n, x, y) => result[x] = decode ? decodeURIComponent(y) : y)
    return name ? result[name] || '' : result
 }
+
+// 是否异步方法或对象
+export const isAsync = function (value) {
+   if (value) {
+      return (value instanceof Promise || value.constructor.name === 'AsyncFunction')
+   }
+   return false
+}

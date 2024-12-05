@@ -4,6 +4,9 @@ import { selectMenu, keyName } from './config/navs'
 import { system } from './config'
 import token from './db/token'
 
+const isAsync = (obj) => {
+   return Object.prototype.toString.call(obj) === '[object AsyncFunction]' || obj instanceof Promise
+}
 
 let router = null
 let route = null
@@ -32,7 +35,7 @@ const create = function (pages, options = {}) {
          routes: pages,
       }, options)
       router = createRouter(myOptions)
-      router.afterEach((to, from) => {
+      router.afterEach(async (to, from) => {
          if (after(to, from)) {
             if ((new Date().getTime() - beginTime.value) > token.keeptime * 1000) {
                token.clear()
@@ -42,8 +45,13 @@ const create = function (pages, options = {}) {
             }
          }
       })
-      router.beforeEach((to, from, next) => {
-         let page = before(to, from)
+      router.beforeEach(async (to, from, next) => {
+         let page = true
+         if (isAsync(before)) {
+            page = await before(to, from, next)
+         } else {
+            page = before(to, from)
+         }
          if (page === true) {
             next()
          } else if (page !== false) {

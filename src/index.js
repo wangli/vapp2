@@ -76,7 +76,11 @@ export const create = function (dom, options = {}) {
    options.frame && addFrame(options.frame)
    // options.frame && useframe(options.frame)
    // 创建应用
-   app = createApp(Appcontent)
+   const appConfig = { await: false }
+   if (typeof options.await == 'boolean') {
+      appConfig.await = options.await
+   }
+   app = createApp(Appcontent, appConfig)
    // 安装插件
    options.plugin && (pluginItems = options.plugin)
    if (Array.isArray(pluginItems)) {
