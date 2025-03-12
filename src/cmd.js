@@ -14,7 +14,7 @@ const cmd = {
       if (Array.isArray(name)) {
          name.forEach(key => {
             this.del(key)
-         });
+         })
       } else if (typeof name == 'string' && actions[name]) {
          delete actions[name]
       }
@@ -33,7 +33,7 @@ const cmd = {
    // 执行命令
    execute(name) {
       if (actions[name] && typeof actions[name] == 'function') {
-         actions[name].apply(actions, [].slice.call(arguments, 1));
+         actions[name].apply(actions, [].slice.call(arguments, 1))
       } else {
          console.error(`当前命令[ ${name} ]无效`)
       }

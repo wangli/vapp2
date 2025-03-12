@@ -1,7 +1,7 @@
-const events = {};
+const events = {}
 
 export default class event {
-   constructor() {}
+   constructor() { }
    // 添加事件
    on(_type, fn, context = this) {
       if (!events[_type]) {
@@ -36,11 +36,11 @@ export default class event {
    }
    // 广播事件
    emit(type) {
-      if (typeof events[type] == 'undefined') return;
+      if (typeof events[type] == 'undefined') return
 
-      let _events = [...events[type]];
+      let _events = [...events[type]]
       for (let _event of _events) {
-         let [fn, context] = _event;
+         let [fn, context] = _event
          if (fn) {
             fn.apply(context, [].slice.call(arguments, 1))
          }

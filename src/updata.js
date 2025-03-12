@@ -24,6 +24,7 @@ const updata = {
     */
    send: async function (value, apiname) {
       let reqData = null
+      let resData = null
       let reject = null
       if (value instanceof Promise) {
          try {
@@ -72,7 +73,7 @@ const updata = {
          }
       }
       try {
-         let resData = await Request(reqData, network)
+         resData = await Request(reqData, network)
          removePendingItems(apiname)
          removePendingItems(reqData.url)
          let data = resData
@@ -114,10 +115,12 @@ const updata = {
       } catch (error) {
          removePendingItems(apiname)
          removePendingItems(reqData.url)
-         if (reject) {
-            throw new Error(reject.message || error.message)
-         } else if (reqData.fully) {
-            throw new Error(error)
+         if (reqData.fully) {
+            return resData
+         } else if (reject) {
+            throw new Error(reject || error.message)
+         } else {
+            throw new Error(error.message)
          }
       }
    },
@@ -129,7 +132,7 @@ const updata = {
       if (obj instanceof Array) {
          obj.forEach(element => {
             _assign(element)
-         });
+         })
       } else if (obj instanceof Object) {
          _assign(obj)
       }
@@ -168,11 +171,11 @@ const removePendingItems = function (value) {
    }
 }
 const _assign = function (obj) {
-   let Mkeys = Object.keys(updata);
-   let Okeys = Object.keys(obj);
-   let keys = intersection(Mkeys, Okeys);
+   let Mkeys = Object.keys(updata)
+   let Okeys = Object.keys(obj)
+   let keys = intersection(Mkeys, Okeys)
    if (keys.length > 0) {
-      throw '存在相同的接口请求方法' + JSON.stringify(keys);
+      throw '存在相同的接口请求方法' + JSON.stringify(keys)
    } else {
       for (let key of Okeys) {
          Object.assign(updata, {

@@ -35,7 +35,7 @@ const use = function (install) {
          // 数组处理
          install.forEach(element => {
             use(element)
-         });
+         })
       }
    }
 }
@@ -112,6 +112,10 @@ export const pages = Pages
 export const cmd = CMD
 // 内置的一些常用方法
 export const v = V
+// 准备完毕
+export const appReady = () => {
+   event.emit('app-ready', true)
+}
 
 
 if (typeof window != 'undefined') {

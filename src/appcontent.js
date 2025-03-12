@@ -24,10 +24,10 @@ export default {
    setup(props) {
       const frame = getFrame()
       const isReady = ref(!props.await)
+      // 等待
+      event.on('app-ready', val => isReady.value = val)
+      // 进入开始
       event.emit('app-created', frameConfig)
-      event.on('app-ready', val => {
-         isReady.value = val
-      })
 
       onMounted(() => {
          event.emit('app-mounted', frameConfig)
