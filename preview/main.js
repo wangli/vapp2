@@ -1,9 +1,11 @@
 import { h, resolveComponent } from 'vue'
-import { create, pages, event } from '../src'
+import { create, pages, event, token, refreshToken } from '../src'
 import demo from './demo.vue'
 import bbb from './bbb.vue'
 import booting from './booting.vue'
 
+refreshToken.value = 'xxxx'
+token.value = 'qqqq'
 // 我是页面A
 const pageA = { name: 'page_a', render: () => h('a', { href: '#/b' }, '我是页面A') }
 // 我是页面B

@@ -2,7 +2,7 @@ import { watch } from 'vue'
 import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 import { selectMenu, keyName } from './config/navs'
 import { system } from './config'
-import token from './db/token'
+import { token } from './db/token'
 
 const isAsync = (obj) => {
    return Object.prototype.toString.call(obj) === '[object AsyncFunction]' || obj instanceof Promise

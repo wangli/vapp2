@@ -7,11 +7,12 @@ let keeptime = 3600
 let keepSession = false
 
 class Token {
-   constructor() {
+   constructor(name) {
+      this.name = name || ''
       this.isAuth = ref(false)
    }
    get key() {
-      return system.name + "_" + network.authKey
+      return system.name + "_" + network.authKey + this.name
    }
    set keeptime(val) {
       keeptime = val
@@ -61,8 +62,15 @@ class Token {
    }
 }
 
-const myToken = new Token()
-if (myToken.value) {
-   myToken.isAuth.value = true
+// 正式令牌
+export const token = new Token()
+if (token.value) {
+   token.isAuth.value = true
 }
-export default myToken
+// 刷新令牌
+export const refreshToken = new Token('_refresh')
+if (refreshToken.value) {
+   refreshToken.isAuth.value = true
+}
+// 默认
+export default token

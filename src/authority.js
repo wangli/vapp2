@@ -1,5 +1,5 @@
 import { event } from './common'
-import token from './db/token'
+import { token } from './db/token'
 
 export const isAuth = token.isAuth
 

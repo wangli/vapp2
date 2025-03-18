@@ -11,7 +11,7 @@ export default defineConfig(({ command }) => {
             "__VAPP2_VERSION__": `'vapp2:${config.version}'`
          },
          build: {
-            sourcemap: true,
+            sourcemap: false,
             lib: {
                entry: path.resolve(__dirname, 'src/index.js'),
                name: 'vapp2'

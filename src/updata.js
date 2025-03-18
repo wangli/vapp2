@@ -1,7 +1,7 @@
 import intersection from 'lodash/intersection'
 import Request from "./utils/request"
 import { state, network } from './config'
-import token from './db/token'
+import { token } from './db/token'
 import cmd from './cmd'
 import { reactive } from 'vue'
 import updataMock from './updataMock'
@@ -56,9 +56,15 @@ const updata = {
       updata.PendingItems.push(...pending)
 
       // 发送拦截处理
-      interceptorItemsReq.forEach(handle => {
-         reqData = handle(reqData, apiname)
-      })
+      const reqLg = interceptorItemsReq.length
+      for (let i = 0; i < reqLg; i++) {
+         const handle = interceptorItemsReq[index]
+         if (isAsync(handle)) {
+            reqData = await handle(reqData, apiname)
+         } else {
+            reqData = handle(reqData, apiname)
+         }
+      }
       // 请求数据模拟返回
       if (network.mock) {
          let mockData = updataMock.getData(apiname, reqData)
@@ -79,9 +85,16 @@ const updata = {
          let data = resData
          let resKey = state.response
          // 获取数据拦截处理
-         interceptorItemsRes.forEach(handle => {
-            data = handle(data, apiname)
-         })
+         const resLg = interceptorItemsRes.length
+         for (let i = 0; i < resLg; i++) {
+            const handle = interceptorItemsRes[index]
+            if (isAsync(handle)) {
+               data = await handle(data, apiname)
+            } else {
+               data = handle(data, apiname)
+            }
+         }
+
          if (data instanceof Function) {
             return data.call(null, apiname)
          } else if (isAsync(data)) {
@@ -117,8 +130,6 @@ const updata = {
          removePendingItems(reqData.url)
          if (reqData.fully) {
             return resData
-         } else if (reject) {
-            throw new Error(reject || error.message)
          } else {
             throw new Error(error.message)
          }

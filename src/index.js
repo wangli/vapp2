@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import Appcontent from './appcontent'
 import { default as Db, createLocalStore } from './db'
-import Token from './db/token'
+import { token as Token, refreshToken as RefreshToken } from './db/token'
 import Pages from './pages'
 import Updata from './updata'
 import * as myConfig from './config'
@@ -98,6 +98,7 @@ export const create = function (dom, options = {}) {
 }
 // token数据
 export const token = Token
+export const refreshToken = RefreshToken
 //接口数据请求
 export const updata = Updata
 // 本地数据处理
