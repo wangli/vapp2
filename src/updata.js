@@ -58,7 +58,7 @@ const updata = {
       // 发送拦截处理
       const reqLg = interceptorItemsReq.length
       for (let i = 0; i < reqLg; i++) {
-         const handle = interceptorItemsReq[index]
+         const handle = interceptorItemsReq[i]
          if (isAsync(handle)) {
             reqData = await handle(reqData, apiname)
          } else {
@@ -87,7 +87,7 @@ const updata = {
          // 获取数据拦截处理
          const resLg = interceptorItemsRes.length
          for (let i = 0; i < resLg; i++) {
-            const handle = interceptorItemsRes[index]
+            const handle = interceptorItemsRes[i]
             if (isAsync(handle)) {
                data = await handle(data, apiname)
             } else {
