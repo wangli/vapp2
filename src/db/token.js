@@ -14,12 +14,18 @@ class Token {
    get key() {
       return system.name + "_" + network.authKey + this.name
    }
+   /**
+    * 保存token时长
+    */
    set keeptime(val) {
       keeptime = val
    }
    get keeptime() {
       return keeptime
    }
+   /**
+    * session保存
+    */
    set keepSession(val) {
       if (typeof val == 'boolean') {
          if (keepSession = !val) {
@@ -35,6 +41,7 @@ class Token {
    get keepSession() {
       return keepSession
    }
+   // 值
    set value(val) {
       if (keepSession) {
          sessionStorage.setItem(this.key, val)
@@ -51,9 +58,15 @@ class Token {
          return localStorage.getItem(this.key)
       }
    }
+   /**
+    * 验证令牌是否作业
+    */
    verify() {
       this.isAuth.value = this.value ? true : false
    }
+   /**
+    * 清空
+    */
    clear() {
       localStorage.removeItem(this.key)
       sessionStorage.removeItem(this.key)

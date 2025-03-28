@@ -9,6 +9,7 @@ import * as V from './v'
 import { event as myEvent } from './common'
 import CMD from './cmd'
 import { addFrame } from './frame'
+import { isAsync } from './utils'
 import './css.less'
 
 let app = null
@@ -76,9 +77,19 @@ export const create = function (dom, options = {}) {
    options.frame && addFrame(options.frame)
    // options.frame && useframe(options.frame)
    // 创建应用
-   const appConfig = { await: false }
+   const appConfig = { await: true }
    if (typeof options.await == 'boolean') {
       appConfig.await = options.await
+   }
+   if (options.created) {
+      myEvent.on('app-created', async (args) => {
+         if (isAsync(options.created) && appConfig.await) {
+            await options.created(args)
+         } else {
+            options.created(args)
+         }
+         event.emit('app-ready', true)
+      })
    }
    app = createApp(Appcontent, appConfig)
    // 安装插件
@@ -96,24 +107,45 @@ export const create = function (dom, options = {}) {
    app.mount(dom)
    return app
 }
-// token数据
+/**
+ * token数据
+ */
 export const token = Token
+/**
+ * refreshToken
+ */
 export const refreshToken = RefreshToken
-//接口数据请求
+/**
+ * 接口数据请求
+ */
 export const updata = Updata
-// 本地数据处理
+/**
+ * 本地数据处理
+ */
 export const db = Db
-// 事件对象
+/**
+ * 事件对象
+ */
 export const event = myEvent
-// 配置项
+/**
+ * 配置项
+ */
 export const config = myConfig
-// 页面路由
+/**
+ * 页面路由
+ */
 export const pages = Pages
-// 命令入口
+/**
+ * 命令入口
+ */
 export const cmd = CMD
-// 内置的一些常用方法
+/**
+ * 内置的一些常用方法
+ */
 export const v = V
-// 准备完毕
+/**
+ * 准备完毕
+ */
 export const appReady = () => {
    event.emit('app-ready', true)
 }

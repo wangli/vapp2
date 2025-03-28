@@ -1,7 +1,11 @@
 const actions = {}
 
 const cmd = {
-   // 添加命令
+   /**
+    * 添加命令
+    * @param {*} name 命令名称
+    * @param {*} action 动作函数
+    */
    add(name, action) {
       if (!actions[name]) {
          actions[name] = action
@@ -9,7 +13,10 @@ const cmd = {
          console.warn(name, '命令已存在')
       }
    },
-   // 删除命令
+   /**
+    * 删除命令
+    * @param {*} name 命令名称
+    */
    del(name) {
       if (Array.isArray(name)) {
          name.forEach(key => {
@@ -19,6 +26,9 @@ const cmd = {
          delete actions[name]
       }
    },
+   /**
+    * 清除所有命令
+    */
    clear() {
       for (const key in actions) {
          if (Object.hasOwnProperty.call(actions, key)) {
@@ -26,11 +36,19 @@ const cmd = {
          }
       }
    },
-   // 获取命令
+   /**
+    * 获取命令
+    * @param {*} name 命令名称
+    * @returns 
+    */
    getAction(name) {
       return actions[name]
    },
-   // 执行命令
+   /**
+    * 执行命令
+    * @param {*} name 命令名称
+    * arguments
+    */
    execute(name) {
       if (actions[name] && typeof actions[name] == 'function') {
          actions[name].apply(actions, [].slice.call(arguments, 1))

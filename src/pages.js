@@ -27,7 +27,12 @@ const beginTime = {
       localStorage.removeItem(system.name + "_" + 'pageBeginTime')
    }
 }
-
+/**
+ * 创建页面路由对象
+ * @param {*} pages 
+ * @param {*} options 
+ * @returns 
+ */
 const create = function (pages, options = {}) {
    if (Array.isArray(pages)) {
       let myOptions = Object.assign({

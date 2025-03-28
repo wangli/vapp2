@@ -17,16 +17,11 @@ const pagesRoute = [
    { path: '/demo', name: 'demo', component: demo }
 ]
 
-event.on('app-created', async () => {
-   await new Promise(res => setTimeout(() => res(), 10000))
-   event.emit('app-ready', true)
-})
 pages.setBefore((to, from) => {
    return true
 })
 // 创建一个最简单的应用
 const app = create('#app', {
-   await: true,
    config: {
       system: {
          name: 'myapp'
@@ -42,5 +37,8 @@ const app = create('#app', {
       global: [bbb],
       booting
    },
-   pages: pagesRoute
+   pages: pagesRoute,
+   created: async () => {
+      await new Promise(res => setTimeout(() => res(), 2000))
+   }
 })
